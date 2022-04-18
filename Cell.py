@@ -5,3 +5,9 @@ class Cell:
         self.y=y
         self.domain = domain
         self.value=value
+
+    def change_color(self):
+        if self.value == "w" or self.value == "W":
+            self.value = "b"
+        else:
+            self.value = "w"

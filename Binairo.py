@@ -1,5 +1,6 @@
 from copy import deepcopy
 import math
+import Cell
 import State
         
 
@@ -99,6 +100,27 @@ def is_assignment_complete(state:State): # check if all variables are assigned o
 
     
     return True
+def backTrack(state:State):
+
+
+    if is_assignment_complete(state): return state
+    unassigned = []
+
+    for i in range(0, state.size):
+        for j in range(0, state.size):
+            if (state.board[i][j].value == '_'):
+                unassigned.append(state.board[i][j])
+    init = unassigned[0]
+
+    for d in init.domain:
+        local_state = deepcopy(state)
+        local_state.board[init.x][init.y].value = d
+        if is_consistent(local_state):
+            result = backTrack(local_state)
+            if result is not None:
+                return result
+    return None
+
 
 def is_consistent(state:State):
     

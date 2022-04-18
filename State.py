@@ -37,3 +37,11 @@ class State:
                     
             print()
             print()
+
+    def get_empty_cells_indexes(self):
+        indexes = []
+        for i in range(0, self.size):
+            for j in range(0, self.size):
+                if self.board[i][j].value == "_":
+                    indexes.append((i, j))
+        return indexes
