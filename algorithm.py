@@ -40,18 +40,23 @@ def FORWARD_CHECKING(state, cell):
 
 def MRV(state):
 
-    variable = None
-    for i in range(state.size):
-        for j in range(state.size):
-            cell = state.board[i][j]
-            if cell.value == '_' and len(cell.domain) == 1:
-                variable = deepcopy(cell)
-                break
-    if variable is None:
-        i, j = state.first_unassigned_index()
-        variable = deepcopy(state.board[i][j])
+    for row in state.board:
 
-    return variable
+        for cell in row:
+            black = False
+            white = False
+            if cell.value == "_":
+                cell.value = 'w'
+                if Binairo.is_consistent(state):
+                    white = True
+                cell.value = 'b'
+                if Binairo.is_consistent(state):
+                    black = True
+                cell.value = "_"
+                if white != black:
+                    return cell
+
+    return None
 
     return None
 def LCV(state):

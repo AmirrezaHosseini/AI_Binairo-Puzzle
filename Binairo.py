@@ -185,6 +185,8 @@ def backTrack_Forward(state:State):
             break
     init = unassigned.pop(0)
 
+    result=None
+
     for d in init.domain:
         init.value=d
         #local_state.board[init.x][init.y].value = d
@@ -194,27 +196,33 @@ def backTrack_Forward(state:State):
                 backTrack_Forward(local_state)
 
 
+
+
+
 # backtrack  using mrv, lcv and forward checking
 def Upgraded_backtrack(state):
     if is_assignment_complete(state):
         state.print_board()
         return
+    unassigned = []
 
-    unassigned = None
+    for row in reversed(state.board):
+        for cell in reversed(row):
+            if cell.value == '_':
+                unassigned.append(cell)
+        if len(unassigned) == 2:
+            break
+    init = unassigned.pop(0)
 
-    # MRV
-    unassigned=algorithm.MRV(state)
-
-    # LCV
-
-"""
-    for domain in unassigned.domain:
-        local_state = deepcopy(state)
-        local_state.board[variable.x][variable.y].value = domain
-        new_state = forward_checking(local_state, variable)
-        if is_consistent(new_state):
-            result = modified_backtrack(new_state)
-            if result is not None:
-                return result
-    return None
-"""
+    result=None
+    count=0
+    for d in init.domain:
+        init.value=d
+        #local_state.board[init.x][init.y].value = d
+        if is_consistent(state):
+            local_state = deepcopy(state)
+            if algorithm.FORWARD_CHECKING(local_state,local_state.board[init.x][init.y]):
+                count+=1
+                backTrack_Forward(local_state)
+    if count==2:
+        result=algorithm.MRV(local_state)
