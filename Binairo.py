@@ -1,6 +1,10 @@
 from copy import deepcopy
 import math
+
+import numpy as np
+import algorithm
 import Cell
+
 import State
         
 
@@ -97,13 +101,15 @@ def is_assignment_complete(state:State): # check if all variables are assigned o
             if(state.board[i][j].value == '_'): # exists a variable wich is not assigned (empty '_')
                 
                 return False
-
+    return True
     
     return True
 def backTrack(state:State):
 
 
-    if is_assignment_complete(state): return state
+    if is_assignment_complete(state):
+        return state
+
     unassigned = []
 
     for i in range(0, state.size):
@@ -126,9 +132,89 @@ def is_consistent(state:State):
     
     return check_Adjancy_Limit(state) and check_circles_limit(state) and is_unique(state)
 
-def check_termination(state:State):
+def check_termination(state):
     
     return is_consistent(state) and is_assignment_complete(state)
 
+def Forward_Checking(state:State,cell):
+
+    unassigned = []
+    for row in state.board[cell.x]:
+        if row.value == '_':
+            unassigned.append(cell)
+    transpose=np.array(state.board).transpose()
+    for col in transpose[cell.y]:
+        if col.value == '_':
+            unassigned.append(col)
+    passQueue = unassigned.copy()
+    while len(unassigned) > 0:
+        c = unassigned.pop(0)
+        count = 0
+        blocked = []
+        for value in c.domain:
+            c.value = value
+
+            if not is_consistent(state):
+                blocked.append(value)
+                count += 1
+        c.value = '_'
+        if count == 1:
+            if blocked[0] == 'b':
+                c.value = 'w'
+            if blocked[0] == 'w':
+                c.value = 'b'
+        if count == 2:
+            return False
+    if algorithm.AC3(state, passQueue):
+        return True
+    else:
+        return False
 
 
+def backTrack_Forward(state:State):
+    if is_assignment_complete(state):
+        state.print_board()
+        return
+    unassigned = []
+
+    for row in reversed(state.board):
+        for cell in reversed(row):
+            if cell.value == '_':
+                unassigned.append(cell)
+        if len(unassigned) == 2:
+            break
+    init = unassigned.pop(0)
+
+    for d in init.domain:
+        init.value=d
+        #local_state.board[init.x][init.y].value = d
+        if is_consistent(state):
+            local_state = deepcopy(state)
+            if algorithm.FORWARD_CHECKING(local_state,local_state.board[init.x][init.y]):
+                backTrack_Forward(local_state)
+
+
+# backtrack  using mrv, lcv and forward checking
+def Upgraded_backtrack(state):
+    if is_assignment_complete(state):
+        state.print_board()
+        return
+
+    unassigned = None
+
+    # MRV
+    unassigned=algorithm.MRV(state)
+
+    # LCV
+
+"""
+    for domain in unassigned.domain:
+        local_state = deepcopy(state)
+        local_state.board[variable.x][variable.y].value = domain
+        new_state = forward_checking(local_state, variable)
+        if is_consistent(new_state):
+            result = modified_backtrack(new_state)
+            if result is not None:
+                return result
+    return None
+"""

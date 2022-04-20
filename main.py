@@ -1,11 +1,12 @@
 from time import time
 from Binairo import *
+
 from Cell import *
 from State import *
 ## w b  
 def main():
     input_numbers = []  ## first row = size of puzzle(n)  ## second row = number of cells that have color in the statrt  (m)  ## row 3 to row 3+m : 
-    input=open("input3.txt").readlines()
+    input=open("input2.txt").readlines()
     for line in input:
         line = line.rstrip()
         numbers = line.split(' ')
@@ -39,11 +40,9 @@ def main():
     state.print_board()
     start_time =time()
     print('Final board:')
-    backTrack(state).print_board()
+    #backTrack(state).print_board()
+    backTrack_Forward(state)
     #implement backTrack and other csp functions in Binairo.py
-
-
-
 
     end_time= time()
     print('time: ',end_time-start_time)
